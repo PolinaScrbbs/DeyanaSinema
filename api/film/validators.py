@@ -3,7 +3,7 @@ from .models import Film
 from .schemes import FilmResponse
 
 
-async def film_to_dydantic(film: Film) -> FilmResponse:
+async def film_to_pydantic(film: Film) -> FilmResponse:
     return FilmResponse(
         id=film.id,
         title=film.title,
@@ -15,7 +15,7 @@ async def film_to_dydantic(film: Film) -> FilmResponse:
     )
 
 
-async def list_films_to_dypdantic(films: List[Film]) -> List[FilmResponse]:
+async def list_film_to_pydantic(films: List[Film]) -> List[FilmResponse]:
     return [
         FilmResponse(
             id=film.id,

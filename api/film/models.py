@@ -32,6 +32,7 @@ class Film(Base):
     release_year = Column(Integer, default=2024, nullable=False)
 
     genres = relationship("Genre", secondary="film_genre", back_populates="films")
+    sessions = relationship("Session", back_populates="film")
 
 
 class Genre(Base):

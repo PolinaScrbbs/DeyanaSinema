@@ -15,7 +15,7 @@ router = APIRouter(prefix="/films")
 
 
 ################################################################################
-#_____________________________________GENRE___________________________________#
+# _____________________________________GENRE___________________________________#
 ##############################################################################
 
 
@@ -77,7 +77,7 @@ async def delete_genre(
 
 
 ################################################################################
-#_____________________________________FILM____________________________________#
+# _____________________________________FILM____________________________________#
 ##############################################################################
 
 
@@ -89,7 +89,7 @@ async def create_film(
 ):
     await cashier_check(current_user)
     created_film = await qr.create_film(session, film_create)
-    return await validator.film_to_dydantic(created_film)
+    return await validator.film_to_pydantic(created_film)
 
 
 @router.get("/", response_model=Union[List[FilmResponse], FilmResponse])
@@ -100,10 +100,10 @@ async def get_films_or_film(
 ):
     if not title:
         films = await qr.get_all_films(session)
-        return await validator.list_films_to_dypdantic(films)
+        return await validator.list_film_to_pydantic(films)
 
     film = await qr.get_film_by_title(session, title)
-    return await validator.film_to_dydantic(film)
+    return await validator.film_to_pydantic(film)
 
 
 @router.get("/{film_id}", response_model=FilmResponse)
@@ -113,7 +113,7 @@ async def get_film_by_id(
     # current_user: User = Depends(get_current_user)
 ):
     film = await qr.get_film_by_id(session, film_id)
-    return await validator.film_to_dydantic(film)
+    return await validator.film_to_pydantic(film)
 
 
 @router.patch("/films/{film_id}")
@@ -124,7 +124,7 @@ async def update_film(
     # current_user: User = Depends(get_current_user)
 ):
     updated_film = await qr.update_film(session, film_id, film_update)
-    return await validator.film_to_dydantic(updated_film)
+    return await validator.film_to_pydantic(updated_film)
 
 
 @router.delete("/{film_id}", status_code=status.HTTP_204_NO_CONTENT)
