@@ -1,10 +1,8 @@
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy import Select, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import  select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..film.models import Film
 from ..film.utils import existing_film_by_id
 from .models import Session
 from .schemes import SessionCreate

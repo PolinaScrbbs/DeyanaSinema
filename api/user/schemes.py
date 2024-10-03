@@ -1,8 +1,4 @@
-from typing import List, Optional, Union
 from pydantic import BaseModel
-from datetime import datetime
-
-from .models import Role
 
 
 class UserCreate(BaseModel):

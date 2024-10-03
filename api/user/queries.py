@@ -1,7 +1,5 @@
-from typing import List, Optional
 from fastapi import HTTPException, status
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import User
