@@ -18,3 +18,4 @@ class Session(Base):
     )
 
     film = relationship("Film", back_populates="sessions")
+    tickets = relationship("Ticket", back_populates="session")
