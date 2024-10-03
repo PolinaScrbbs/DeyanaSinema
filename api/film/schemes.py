@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union
 
-from .models import Genre, AgeRating
+from .models import AgeRating
 
 
 class GenreCreate(BaseModel):
@@ -20,6 +20,15 @@ class FilmCreate(BaseModel):
     duration: int = Field(..., ge=120, description="Duration in minutes")
     release_year: int = Field(..., ge=1888, description="Year of film release")
     genre_ids: List[int]
+
+
+class FilmUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    age_rating: Optional[AgeRating] = None
+    duration: Optional[int] = None
+    release_year: Optional[int] = None
+    genre_ids: Optional[List[int]] = None
 
 
 class FilmResponse(BaseModel):

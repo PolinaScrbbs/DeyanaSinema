@@ -5,12 +5,12 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Film, Genre
-from .schemes import GenreCreate, GenreResponse, FilmCreate, FilmResponse
+from .schemes import GenreCreate, GenreResponse, FilmCreate, FilmUpdate
 from .utils import existing_film_by_title
 
 
 ################################################################################
-# ____________________________________GENRE____________________________________#
+#_____________________________________GENRE___________________________________#
 ##############################################################################
 
 
@@ -59,12 +59,35 @@ async def get_genre_by_title(session: AsyncSession, genre_title: str) -> Genre:
     return genre
 
 
+async def update_genre(
+    session: AsyncSession, genre_id: int, genre_update: GenreCreate
+) -> Genre:
+    genre = await get_genre_by_id(session, genre_id)
+    if not genre:
+        raise HTTPException(status_code=404, detail="Жанр не найден.")
+
+    genre.title = genre_update.title
+    await session.commit()
+    await session.refresh(genre)
+
+    return genre
+
+
+async def delete_genre(session: AsyncSession, genre_id: int) -> None:
+    genre = await session.get(Genre, genre_id)
+    if not genre:
+        raise HTTPException(status_code=404, detail="Жанр не найден.")
+
+    await session.delete(genre)
+    await session.commit()
+
+
 ################################################################################
-# ____________________________________FILM_____________________________________#
+#_____________________________________FILM____________________________________#
 ##############################################################################
 
 
-async def create_film(session: AsyncSession, film_create: FilmCreate) -> FilmResponse:
+async def create_film(session: AsyncSession, film_create: FilmCreate) -> Film:
     existing_film = await existing_film_by_title(session, film_create.title)
 
     if existing_film:
@@ -96,67 +119,82 @@ async def create_film(session: AsyncSession, film_create: FilmCreate) -> FilmRes
     session.add(new_film)
     await session.commit()
 
-    return FilmResponse(
-        id=new_film.id,
-        title=new_film.title,
-        description=new_film.description,
-        age_rating=new_film.age_rating,
-        duration=new_film.duration,
-        release_year=new_film.release_year,
-        genres=[genre.title for genre in new_film.genres],
-    )
+    return new_film
 
 
-async def get_all_films(session: AsyncSession) -> List[FilmResponse]:
+async def get_all_films(session: AsyncSession) -> List[Film]:
     result = await session.execute(select(Film).options(selectinload(Film.genres)))
     films = result.scalars().all()
     if not films:
         raise HTTPException(status_code=404, detail="Фильмы не найдены.")
-    return [
-        FilmResponse(
-            id=film.id,
-            title=film.title,
-            description=film.description,
-            age_rating=film.age_rating,
-            duration=film.duration,
-            release_year=film.release_year,
-            genres=[genre.title for genre in film.genres],
-        )
-        for film in films
-    ]
+
+    return films
 
 
-async def get_film_by_id(session: AsyncSession, film_id: int) -> FilmResponse:
+async def get_film_by_id(session: AsyncSession, film_id: int) -> Film:
     result = await session.execute(
         select(Film).where(Film.id == film_id).options(selectinload(Film.genres))
     )
     film = result.scalar_one_or_none()
     if not film:
         raise HTTPException(status_code=404, detail="Фильм не найден.")
-    return FilmResponse(
-        id=film.id,
-        title=film.title,
-        description=film.description,
-        age_rating=film.age_rating,
-        duration=film.duration,
-        release_year=film.release_year,
-        genres=[genre.title for genre in film.genres],
-    )
+    return film
 
 
-async def get_film_by_title(session: AsyncSession, film_title: str) -> FilmResponse:
+async def get_film_by_title(session: AsyncSession, film_title: str) -> Film:
     result = await session.execute(
         select(Film).where(Film.title == film_title).options(selectinload(Film.genres))
     )
     film = result.scalar_one_or_none()
     if not film:
         raise HTTPException(status_code=404, detail="Фильм не найден.")
-    return FilmResponse(
-        id=film.id,
-        title=film.title,
-        description=film.description,
-        age_rating=film.age_rating,
-        duration=film.duration,
-        release_year=film.release_year,
-        genres=[genre.title for genre in film.genres],
-    )
+    return film
+
+
+async def update_film(
+    session: AsyncSession, film_id: int, film_update: FilmUpdate
+) -> Film:
+    film = await get_film_by_id(session, film_id)
+    if not film:
+        raise HTTPException(status_code=404, detail="Фильм не найден.")
+
+    if film_update.title is not None:
+        film.title = film_update.title
+    if film_update.description is not None:
+        film.description = film_update.description
+    if film_update.age_rating is not None:
+        film.age_rating = film_update.age_rating
+    if film_update.duration is not None:
+        film.duration = film_update.duration
+    if film_update.release_year is not None:
+        film.release_year = film_update.release_year
+
+    if film_update.genre_ids is not None:
+        genres = await session.execute(
+            select(Genre).where(Genre.id.in_(film_update.genre_ids))
+        )
+        genre_list = genres.scalars().all()
+
+        if len(genre_list) != len(film_update.genre_ids):
+            raise HTTPException(
+                status_code=404, detail="Один или несколько жанров не найдены."
+            )
+
+        film.genres.clear()
+        film.genres.extend(genre_list)
+
+    await session.commit()
+    await session.refresh(film)
+
+    print(film.age_rating)
+
+    return film
+
+
+async def delete_film(session: AsyncSession, film_id: int) -> None:
+    film = await session.get(Film, film_id)
+    if not film:
+        raise HTTPException(status_code=404, detail="Фильм не найден.")
+
+    await session.delete(film)
+    await session.commit()

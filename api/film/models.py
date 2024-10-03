@@ -1,10 +1,5 @@
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-
-from fastapi import HTTPException, status
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Table
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..user.models import Base, BaseEnum
 
