@@ -12,12 +12,21 @@ from enum import Enum as BaseEnum
 
 from config import SECRET_KEY
 
+
 class Base(DeclarativeBase):
     pass
+
+
+class BaseEnum(BaseEnum):
+    @classmethod
+    async def get_values(cls):
+        return [breed.value for breed in cls]
+
 
 class Role(BaseEnum):
     USER = "Пользователь"
     CASHIER = "Кассир"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -89,5 +98,5 @@ class Token(Base):
         await session.commit()
 
         return status.HTTP_200_OK, "The user's token has been updated", self
-    
+
     user = relationship("User", back_populates="tokens")

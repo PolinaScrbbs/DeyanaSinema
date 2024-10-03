@@ -21,7 +21,7 @@ async def registration_user(session: AsyncSession, user_create: UserCreate) -> B
         id=user.id,
         username=user.username,
         role=user.role.value,
-        full_name=user.full_name
+        full_name=user.full_name,
     )
 
 
@@ -76,6 +76,7 @@ async def verify_token_and_get_user(session: AsyncSession, token: str) -> User:
     user = await get_user_by_id(session, token.user_id)
 
     return user
+
 
 async def get_current_user(
     session: AsyncSession = Depends(get_session),
