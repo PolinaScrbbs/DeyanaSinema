@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -10,13 +10,12 @@ class SessionCreate(BaseModel):
     start_time: Optional[datetime] = None
 
 
+class SessionUpdate(BaseModel):
+    film_id: Optional[int] = None
+    start_time: Optional[datetime] = None
+
+
 class SessionResponse(BaseModel):
     id: int
     film: FilmResponse
-    start_time: datetime
-
-
-class SessionsResponse(BaseModel):
-    id: int
-    film: List[FilmResponse]
     start_time: datetime

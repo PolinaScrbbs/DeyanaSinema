@@ -7,7 +7,7 @@ from ..auth.queries import get_current_user
 from ..user.models import User
 from ..user.utils import cashier_check
 
-from .schemes import SessionCreate, SessionResponse
+from .schemes import SessionCreate, SessionResponse, SessionUpdate
 from . import queries as qr
 from . import validators as validator
 
@@ -37,3 +37,24 @@ async def get_session_by_id(
 ):
     film_session = await qr.get_session_by_id(async_session, session_id)
     return await validator.session_to_pydantic(async_session, film_session)
+
+
+@router.patch("/{session_id}", response_model=SessionResponse)
+async def update_session(
+    session_id: int,
+    session_update: SessionUpdate,
+    async_session: AsyncSession = Depends(get_session),
+    # current_user: User = Depends(get_current_user),
+):
+    updated_session = await qr.update_session(async_session, session_id, session_update)
+    return await validator.session_to_pydantic(async_session, updated_session)
+
+
+@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_session(
+    session_id: int,
+    async_session: AsyncSession = Depends(get_session),
+    # current_user: User = Depends(get_current_user),
+):
+    await qr.delete_session(async_session, session_id)
+    return None

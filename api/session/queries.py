@@ -1,11 +1,11 @@
 from typing import List
 from fastapi import HTTPException, status
-from sqlalchemy import  select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..film.utils import existing_film_by_id
 from .models import Session
-from .schemes import SessionCreate
+from .schemes import SessionCreate, SessionUpdate
 
 
 async def create_session(
@@ -42,3 +42,29 @@ async def get_session_by_id(session: AsyncSession, session_id: int) -> Session:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Сеанс не найден")
 
     return film_session
+
+
+async def update_session(
+    async_session: AsyncSession, session_id: int, session_update: SessionUpdate
+) -> Session:
+    session = await get_session_by_id(async_session, session_id)
+
+    if session_update.film_id is not None:
+        session.film_id = session_update.film_id
+    if session_update.start_time is not None:
+        session.start_time = session_update.start_time
+
+    async_session.add(session)
+    await async_session.commit()
+    await async_session.refresh(session)
+
+    return session
+
+
+async def delete_session(async_session: AsyncSession, session_id: int) -> None:
+    session = await async_session.get(Session, session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Фильм не найден.")
+
+    await async_session.delete(session)
+    await async_session.commit()
