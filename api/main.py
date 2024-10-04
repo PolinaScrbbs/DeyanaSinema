@@ -7,7 +7,7 @@ from .ticket.router import router as ticketRouter
 from .reservation.router import router as reservationRouter
 
 app = FastAPI(
-    title="Kittens API", description="A Test Task About Kittens", version="1.0.0"
+    title="Deyana Sinema", description="The API of a Small Cinema for Kittens", version="2.2.8"
 )
 
 app.include_router(authRouter, tags=["Auth"])
