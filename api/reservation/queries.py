@@ -24,7 +24,6 @@ async def create_reservation(
         select(User.role).where(User.id == reservation_data.booked_user_id)
     )
     booked_user_role = result.scalar()
-    print(f"Booked user role: {booked_user_role}, Expected: {Role.CASHIER}")
     if booked_user_role == Role.CASHIER:
         raise HTTPException(
             status.HTTP_409_CONFLICT, "Вы не можете сделать бронь на кассира"
@@ -41,3 +40,45 @@ async def create_reservation(
     await session.refresh(new_reservation)
 
     return new_reservation
+
+
+async def get_all_reservations(session: AsyncSession) -> List[Reservation]:
+    result = await session.execute(select(Reservation))
+    reservations = result.scalars().all()
+    if not reservations:
+        raise HTTPException(status.HTTP_204_NO_CONTENT)
+    return reservations
+
+
+async def get_reservation_by_id(
+    session: AsyncSession, reservation_id: int, current_user: User
+) -> Reservation:
+    result = await session.execute(
+        select(Reservation).where(Reservation.id == reservation_id)
+    )
+    reservation = result.scalar_one_or_none()
+    if not reservation:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Резервация не найдена")
+
+    if current_user.role == Role.USER and reservation.booked_user_id != current_user.id:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail="Вы не имеете доступа к чужим резервациям"
+        )
+
+    return reservation
+
+
+async def delete_reservation(session: AsyncSession, reservation_id: int) -> None:
+    result = await session.execute(
+        select(Reservation).where(Reservation.id == reservation_id)
+    )
+    reservation = result.scalars().first()
+
+    if not reservation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Reservation not found"
+        )
+
+    await session.delete(reservation)
+    await session.commit()
+    return None

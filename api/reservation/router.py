@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -14,7 +15,9 @@ from . import validators as validator
 router = APIRouter(prefix="/reservations")
 
 
-@router.post("/", response_model=ReservationResponse)
+@router.post(
+    "/", response_model=ReservationResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_reservation(
     reservation_data: ReservationCreate,
     session: AsyncSession = Depends(get_session),
@@ -25,3 +28,36 @@ async def create_reservation(
         session, reservation_data, current_user.id
     )
     return await validator.reservation_to_pydantic(session, created_reservation)
+
+
+@router.get("/", response_model=List[ReservationResponse])
+async def get_reservations(
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    await cashier_check(current_user)
+    reservations = await qr.get_all_reservations(session)
+    return [
+        await validator.reservation_to_pydantic(session, res) for res in reservations
+    ]
+
+
+@router.get("/{reservation_id}", response_model=ReservationResponse)
+async def get_reservation_by_id(
+    reservation_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    reservation = await qr.get_reservation_by_id(session, reservation_id, current_user)
+    return await validator.reservation_to_pydantic(session, reservation)
+
+
+@router.delete("/{reservation_id}", status_code=status.HTTP_200_OK)
+async def delete_reservation(
+    reservation_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    await cashier_check(current_user)
+    await qr.delete_reservation(session, reservation_id)
+    return "Резервация удалена"
