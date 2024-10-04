@@ -39,6 +39,14 @@ class User(Base):
     full_name = Column(String(40), nullable=False)
 
     tokens = relationship("Token", back_populates="user")
+    booked_reservations = relationship(
+        "Reservation",
+        foreign_keys="[Reservation.booked_user_id]",
+        back_populates="booked_user",
+    )
+    processed_reservations = relationship(
+        "Reservation", foreign_keys="[Reservation.cashier_id]", back_populates="cashier"
+    )
 
     async def set_password(self, password: str) -> None:
         self.hashed_password = bcrypt.hashpw(

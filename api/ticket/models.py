@@ -15,8 +15,8 @@ class RoomType(BaseEnum):
         return self.value["title"]
 
     @property
-    async def price(self) -> int:
-        return self.value["price"]
+    async def extra_charge(self) -> int:
+        return self.value["extra_charge"]
 
 
 class RoomNumber(BaseEnum):
@@ -80,3 +80,4 @@ class Ticket(Base):
     place = Column(Enum(Place), default=Place.PLACE_1, nullable=False)
 
     session = relationship("Session", back_populates="tickets")
+    reservation = relationship("Reservation", back_populates="ticket", uselist=False)
