@@ -13,6 +13,13 @@ class TicketCreate(BaseModel):
     place: Place
 
 
+class UpdateTicket(BaseModel):
+    basic_price: float = None
+    room_number: str = None
+    row_number: TicketRow = None
+    place: Place = None
+
+
 class TicketResponse(BaseModel):
     basic_price: float
     room_number: int

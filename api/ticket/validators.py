@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..session.queries import get_session_by_id
@@ -18,3 +19,14 @@ async def ticket_to_pydantic(session: AsyncSession, ticket: Ticket) -> TicketRes
         place=ticket.place,
         session=pydantic_ticket_session,
     )
+
+
+async def list_tickets_to_pydantic(
+    session: AsyncSession, tickets: List[Ticket]
+) -> List[TicketResponse]:
+    ticket_responses = []
+    for ticket in tickets:
+        ticket_response = await ticket_to_pydantic(session, ticket)
+        ticket_responses.append(ticket_response)
+
+    return ticket_responses
