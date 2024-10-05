@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..film.utils import existing_film_by_id
 from ..ticket.models import Ticket
+from ..reservation.models import Reservation
+
 from .models import Session
 from .schemes import SessionCreate, SessionUpdate
 from .utils import session_exists_by_id
@@ -49,9 +51,14 @@ async def get_session_by_id(session: AsyncSession, session_id: int) -> Session:
 async def get_session_tickets(session: AsyncSession, session_id: int) -> List[Ticket]:
     await session_exists_by_id(session, session_id)
 
+    reserved_ticket_ids = select(Reservation.ticket_id)
+
     result = await session.execute(
-        select(Ticket).where(Ticket.session_id == session_id)
+        select(Ticket).where(
+            Ticket.session_id == session_id, Ticket.id.not_in(reserved_ticket_ids)
+        )
     )
+
     tickets = result.scalars().all()
     if not tickets:
         raise HTTPException(status.HTTP_204_NO_CONTENT)

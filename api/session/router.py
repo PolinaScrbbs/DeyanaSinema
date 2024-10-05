@@ -6,7 +6,6 @@ from ..database import get_session
 from ..auth.queries import get_current_user
 from ..user.models import User
 from ..user import utils as ut
-from ..ticket.validators import list_tickets_to_pydantic
 
 from .schemes import (
     SessionCreate,
@@ -56,7 +55,7 @@ async def get_sesssion_tickets(
     session = await qr.get_session_by_id(async_session, session_id)
     pydantic_session = await validator.session_to_pydantic(async_session, session)
     session_tickets = await qr.get_session_tickets(async_session, session_id)
-    pydatnic_session_tickets = await list_tickets_to_pydantic(
+    pydatnic_session_tickets = await validator.list_tickets_to_pydantic(
         async_session, session_tickets
     )
 

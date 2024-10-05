@@ -23,11 +23,11 @@ class SessionResponse(BaseModel):
 
 
 class TicketResponse(BaseModel):
+    id: int
     basic_price: float
     room_number: int
     row_number: TicketRow
     place: Place
-    session: SessionResponse
 
 
 class SessionResponseWithTickets(SessionResponse):
