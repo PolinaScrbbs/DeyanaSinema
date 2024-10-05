@@ -1,12 +1,11 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
 from ..database import get_session
 from ..auth.queries import get_current_user
 from ..user.models import User
-from ..user.utils import cashier_check
+from ..user import utils as ut
 
 from .schemes import ReservationCreate, ReservationResponse
 from . import queries as qr
@@ -23,7 +22,7 @@ async def create_reservation(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    await cashier_check(current_user)
+    await ut.cashier_check(current_user)
     created_reservation = await qr.create_reservation(
         session, reservation_data, current_user.id
     )
@@ -35,7 +34,7 @@ async def get_reservations(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    await cashier_check(current_user)
+    await ut.cashier_check(current_user)
     reservations = await qr.get_all_reservations(session)
     return [
         await validator.reservation_to_pydantic(session, res) for res in reservations
@@ -58,6 +57,6 @@ async def delete_reservation(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    await cashier_check(current_user)
+    await ut.admin_check(current_user)
     await qr.delete_reservation(session, reservation_id)
     return "Резервация удалена"

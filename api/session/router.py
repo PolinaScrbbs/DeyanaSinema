@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_session
 from ..auth.queries import get_current_user
 from ..user.models import User
-from ..user.utils import cashier_check
+from ..user import utils as ut
 
 from .schemes import SessionCreate, SessionResponse, SessionUpdate
 from . import queries as qr
@@ -20,7 +20,7 @@ async def create_session(
     async_session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    await cashier_check(current_user)
+    await ut.admin_check(current_user)
     created_session = await qr.create_session(async_session, session_create)
     return await validator.session_to_pydantic(async_session, created_session)
 
@@ -33,7 +33,9 @@ async def get_all_sessions(async_session: AsyncSession = Depends(get_session)):
 
 @router.get("/{session_id}", response_model=SessionResponse)
 async def get_session_by_id(
-    session_id: int, async_session: AsyncSession = Depends(get_session)
+    session_id: int, 
+    async_session: AsyncSession = Depends(get_session),
+    # current_user: User = Depends(get_current_user),
 ):
     film_session = await qr.get_session_by_id(async_session, session_id)
     return await validator.session_to_pydantic(async_session, film_session)
@@ -44,8 +46,9 @@ async def update_session(
     session_id: int,
     session_update: SessionUpdate,
     async_session: AsyncSession = Depends(get_session),
-    # current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
+    await ut.admin_check(current_user)
     updated_session = await qr.update_session(async_session, session_id, session_update)
     return await validator.session_to_pydantic(async_session, updated_session)
 
@@ -54,7 +57,8 @@ async def update_session(
 async def delete_session(
     session_id: int,
     async_session: AsyncSession = Depends(get_session),
-    # current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
+    await ut.admin_check(current_user)
     await qr.delete_session(async_session, session_id)
     return None

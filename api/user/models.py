@@ -26,6 +26,7 @@ class BaseEnum(BaseEnum):
 class Role(BaseEnum):
     USER = "Пользователь"
     CASHIER = "Кассир"
+    ADMIN = "Администратор"
 
 
 class User(Base):

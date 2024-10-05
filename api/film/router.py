@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_session
 from ..auth.queries import get_current_user
 from ..user.models import User
-from ..user.utils import cashier_check
+from ..user import utils as ut
 
 from .schemes import GenreCreate, GenreResponse, FilmCreate, FilmUpdate, FilmResponse
 from . import queries as qr
@@ -27,7 +27,7 @@ async def create_genre(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    await cashier_check(current_user)
+    await ut.admin_check(current_user)
     return await qr.create_genre(session, genre_create)
 
 
@@ -60,8 +60,9 @@ async def update_genre(
     genre_id: int,
     genre_update: GenreCreate,
     session: AsyncSession = Depends(get_session),
-    # current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
+    await ut.admin_check(current_user)
     updated_genre = await qr.update_genre(session, genre_id, genre_update)
     return updated_genre
 
@@ -70,8 +71,9 @@ async def update_genre(
 async def delete_genre(
     genre_id: int,
     session: AsyncSession = Depends(get_session),
-    # current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
+    await ut.admin_check(current_user)
     await qr.delete_genre(session, genre_id)
     return None
 
@@ -87,7 +89,7 @@ async def create_film(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    await cashier_check(current_user)
+    await ut.admin_check(current_user)
     created_film = await qr.create_film(session, film_create)
     return await validator.film_to_pydantic(created_film)
 
@@ -121,8 +123,9 @@ async def update_film(
     film_id: int,
     film_update: FilmUpdate,
     session: AsyncSession = Depends(get_session),
-    # current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
+    await ut.admin_check(current_user)
     updated_film = await qr.update_film(session, film_id, film_update)
     return await validator.film_to_pydantic(updated_film)
 
@@ -131,7 +134,8 @@ async def update_film(
 async def delete_film(
     film_id: int,
     session: AsyncSession = Depends(get_session),
-    # current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
+    await ut.admin_check(current_user)
     await qr.delete_film(session, film_id)
     return None
