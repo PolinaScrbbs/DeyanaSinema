@@ -14,7 +14,9 @@ from . import validators as validator
 router = APIRouter(prefix="/reservations")
 
 
-@router.post("/", response_model=ReservationResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=ReservationResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_reservation(
     reservation_data: ReservationCreate,
     session: AsyncSession = Depends(get_session),

@@ -25,7 +25,9 @@ async def create_reservation(
     )
     booked_user_role = result.scalar()
     if booked_user_role == Role.CASHIER:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Вы не можете сделать бронь на кассира")
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Вы не можете сделать бронь на кассира"
+        )
 
     new_reservation = Reservation(
         ticket_id=reservation_data.ticket_id,
@@ -59,7 +61,9 @@ async def get_reservation_by_id(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Резервация не найдена")
 
     if current_user.role == Role.USER and reservation.booked_user_id != current_user.id:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Вы не имеете доступа к чужим резервациям")
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="Вы не имеете доступа к чужим резервациям"
+        )
 
     return reservation
 
@@ -71,7 +75,9 @@ async def delete_reservation(session: AsyncSession, reservation_id: int) -> None
     reservation = result.scalars().first()
 
     if not reservation:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Резервация не найдена")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Резервация не найдена"
+        )
 
     await session.delete(reservation)
     await session.commit()

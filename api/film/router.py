@@ -19,7 +19,9 @@ router = APIRouter(prefix="/films")
 ##############################################################################
 
 
-@router.post("/genres/", response_model=GenreResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/genres/", response_model=GenreResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_genre(
     genre_create: GenreCreate,
     session: AsyncSession = Depends(get_session),
@@ -58,7 +60,7 @@ async def update_genre(
     genre_id: int,
     genre_update: GenreCreate,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     updated_genre = await qr.update_genre(session, genre_id, genre_update)
@@ -69,7 +71,7 @@ async def update_genre(
 async def delete_genre(
     genre_id: int,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     await qr.delete_genre(session, genre_id)
@@ -121,7 +123,7 @@ async def update_film(
     film_id: int,
     film_update: FilmUpdate,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     updated_film = await qr.update_film(session, film_id, film_update)
@@ -132,7 +134,7 @@ async def update_film(
 async def delete_film(
     film_id: int,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     await qr.delete_film(session, film_id)

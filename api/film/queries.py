@@ -22,7 +22,10 @@ async def create_genre(
     )
 
     if existing_genre.scalar() is not None:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Жанр с таким названием уже существует",)
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Жанр с таким названием уже существует",
+        )
 
     new_genre = Genre(title=genre_create.title)
     session.add(new_genre)
@@ -88,7 +91,9 @@ async def create_film(session: AsyncSession, film_create: FilmCreate) -> Film:
     existing_film = await existing_film_by_title(session, film_create.title)
 
     if existing_film:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Фильм с таким названием уже существует")
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Фильм с таким названием уже существует"
+        )
 
     new_film = Film(
         title=film_create.title,
@@ -104,7 +109,10 @@ async def create_film(session: AsyncSession, film_create: FilmCreate) -> Film:
     genre_list = genres.scalars().all()
 
     if len(genre_list) != len(film_create.genre_ids):
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Один или несколько жанров не найдены",)
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "Один или несколько жанров не найдены",
+        )
 
     new_film.genres.extend(genre_list)
     session.add(new_film)
@@ -167,7 +175,9 @@ async def update_film(
         genre_list = genres.scalars().all()
 
         if len(genre_list) != len(film_update.genre_ids):
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Один или несколько жанров не найдены")
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND, "Один или несколько жанров не найдены"
+            )
 
         film.genres.clear()
         film.genres.extend(genre_list)

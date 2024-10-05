@@ -4,8 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..film.utils import existing_film_by_id
+from ..ticket.models import Ticket
 from .models import Session
 from .schemes import SessionCreate, SessionUpdate
+from .utils import session_exists_by_id
 
 
 async def create_session(
@@ -42,6 +44,18 @@ async def get_session_by_id(session: AsyncSession, session_id: int) -> Session:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Сеанс не найден")
 
     return film_session
+
+
+async def get_session_tickets(session: AsyncSession, session_id: int) -> List[Ticket]:
+    await session_exists_by_id(session, session_id)
+
+    result = await session.execute(
+        select(Ticket).where(Ticket.session_id == session_id)
+    )
+    tickets = result.scalars().all()
+    if not tickets:
+        raise HTTPException(status.HTTP_204_NO_CONTENT)
+    return tickets
 
 
 async def update_session(

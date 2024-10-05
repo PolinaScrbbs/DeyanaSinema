@@ -19,7 +19,7 @@ router = APIRouter(prefix="/tickets")
 async def create_ticket(
     ticket_create: TicketCreate,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     created_ticket = await qr.create_ticket(session, ticket_create)
@@ -39,7 +39,7 @@ async def update_ticket(
     ticket_id: int,
     ticket_data: UpdateTicket,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     updated_ticket = await qr.update_ticket(session, ticket_id, ticket_data)
@@ -48,9 +48,9 @@ async def update_ticket(
 
 @router.delete("/tickets/{ticket_id}", status_code=status.HTTP_200_OK)
 async def delete_ticket(
-    ticket_id: int, 
+    ticket_id: int,
     session: AsyncSession = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     await ut.admin_check(current_user)
     await qr.delete_ticket(session, ticket_id)

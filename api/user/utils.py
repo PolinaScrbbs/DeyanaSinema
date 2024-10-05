@@ -4,13 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import User, Role
 
+
 async def admin_check(user: User):
     if user.role is not Role.ADMIN:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             "Только администратор имет доступ к этому ендпоинту",
         )
-    
+
+
 async def cashier_check(user: User):
     if user.role is Role.USER:
         raise HTTPException(

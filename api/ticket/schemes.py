@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from ..session.schemes import SessionResponse
 
-from .models import RoomNumber, TicketRow, Place
+from .models import TicketRow, Place
 
 
 class TicketCreate(BaseModel):
