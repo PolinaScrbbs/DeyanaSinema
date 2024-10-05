@@ -53,7 +53,7 @@ async def update_session(
     return await validator.session_to_pydantic(async_session, updated_session)
 
 
-@router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{session_id}", status_code=status.HTTP_200_OK)
 async def delete_session(
     session_id: int,
     async_session: AsyncSession = Depends(get_session),
@@ -61,4 +61,4 @@ async def delete_session(
 ):
     await ut.admin_check(current_user)
     await qr.delete_session(async_session, session_id)
-    return None
+    return "Сеанс удалён"

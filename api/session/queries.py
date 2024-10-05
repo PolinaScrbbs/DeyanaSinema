@@ -64,7 +64,7 @@ async def update_session(
 async def delete_session(async_session: AsyncSession, session_id: int) -> None:
     session = await async_session.get(Session, session_id)
     if not session:
-        raise HTTPException(status_code=404, detail="Фильм не найден.")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Фильм не найден.")
 
     await async_session.delete(session)
     await async_session.commit()

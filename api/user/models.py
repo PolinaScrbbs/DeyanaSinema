@@ -80,7 +80,7 @@ class Token(Base):
     async def verify_token(self, session: AsyncSession, user: Optional[User]):
         try:
             jwt.decode(self.token, SECRET_KEY, algorithms=["HS256"])
-            return status.HTTP_200_OK, "The user's token has been verified", self
+            return status.HTTP_200_OK, "Токен верефицирован", self
 
         except jwt.ExpiredSignatureError:
             return await self.refresh_token(session, user)
@@ -88,7 +88,7 @@ class Token(Base):
         except jwt.InvalidTokenError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
+                detail="Неправильный токен",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
@@ -96,7 +96,7 @@ class Token(Base):
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Expired token",
+                detail="Токен истёк",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
@@ -106,6 +106,6 @@ class Token(Base):
         session.add(self)
         await session.commit()
 
-        return status.HTTP_200_OK, "The user's token has been updated", self
+        return status.HTTP_200_OK, "Токен обновлён", self
 
     user = relationship("User", back_populates="tokens")

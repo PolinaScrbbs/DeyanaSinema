@@ -66,7 +66,7 @@ async def update_ticket(
 async def delete_ticket(session: AsyncSession, ticket_id: int) -> None:
     ticket = await session.get(Ticket, ticket_id)
     if not ticket:
-        raise HTTPException(status_code=404, detail="Ticket not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Билет не найден")
 
     await session.delete(ticket)
     await session.commit()

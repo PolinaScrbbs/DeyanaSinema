@@ -10,4 +10,4 @@ async def session_exists_by_id(session: AsyncSession, session_id: int) -> None:
     user_exists = result.scalar()
 
     if not user_exists:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Сессия не найдена")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Сессия не найдена")

@@ -27,7 +27,7 @@ async def create_user(
 
     user = await qr.registration_user(session, user_create)
     return JSONResponse(
-        content=UserResponse(message="User created successfully", user=user).dict(),
+        content=UserResponse(message="Пользователь зарегестрирован", user=user).dict(),
         status_code=status.HTTP_201_CREATED,
     )
 

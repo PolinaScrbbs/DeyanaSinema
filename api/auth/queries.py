@@ -36,12 +36,12 @@ async def login(session: AsyncSession, login: str, password: str) -> Token:
     user = await get_user_by_username(session, login)
 
     if user is None:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Пользователь не найден")
 
     correct_password = await user.check_password(password)
 
     if not correct_password:
-        raise HTTPException(status_code=400, detail="Incorrect password")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Неверный пароль")
 
     token = await get_user_token(session, user.id)
 
@@ -49,7 +49,7 @@ async def login(session: AsyncSession, login: str, password: str) -> Token:
         token = await user.generate_token()
         token = Token(user_id=user.id, token=token)
         status_code = status.HTTP_201_CREATED
-        msg = "A user token has been created"
+        msg = "Пользователь зарегестрирован"
 
         session.add(token)
         await session.commit()
@@ -70,7 +70,7 @@ async def verify_token_and_get_user(session: AsyncSession, token: str) -> User:
     token = await get_token(session, token)
 
     if token is None:
-        raise HTTPException(status_code=400, detail="Token not found")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Токен не найден")
 
     await token.verify_token(session, None)
     user = await get_user_by_id(session, token.user_id)

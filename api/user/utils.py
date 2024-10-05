@@ -7,15 +7,15 @@ from .models import User, Role
 async def admin_check(user: User):
     if user.role is not Role.ADMIN:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Только администратор имет доступ к этому ендпоинту",
+            status.HTTP_403_FORBIDDEN,
+            "Только администратор имет доступ к этому ендпоинту",
         )
     
 async def cashier_check(user: User):
     if user.role is Role.USER:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Пользователи не имеют достпуп к этому ендпоинту",
+            status.HTTP_403_FORBIDDEN,
+            "Пользователи не имеют достпуп к этому ендпоинту",
         )
 
 

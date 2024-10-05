@@ -46,7 +46,7 @@ async def update_ticket(
     return await validator.ticket_to_pydantic(session, updated_ticket)
 
 
-@router.delete("/tickets/{ticket_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/tickets/{ticket_id}", status_code=status.HTTP_200_OK)
 async def delete_ticket(
     ticket_id: int, 
     session: AsyncSession = Depends(get_session),
@@ -54,4 +54,4 @@ async def delete_ticket(
 ):
     await ut.admin_check(current_user)
     await qr.delete_ticket(session, ticket_id)
-    return None
+    return "Билет удалён"

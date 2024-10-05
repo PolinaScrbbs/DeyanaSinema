@@ -19,9 +19,7 @@ router = APIRouter(prefix="/films")
 ##############################################################################
 
 
-@router.post(
-    "/genres/", response_model=GenreResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/genres/", response_model=GenreResponse, status_code=status.HTTP_201_CREATED)
 async def create_genre(
     genre_create: GenreCreate,
     session: AsyncSession = Depends(get_session),
@@ -67,7 +65,7 @@ async def update_genre(
     return updated_genre
 
 
-@router.delete("/genres/{genre_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/genres/{genre_id}", status_code=status.HTTP_200_OK)
 async def delete_genre(
     genre_id: int,
     session: AsyncSession = Depends(get_session),
@@ -75,7 +73,7 @@ async def delete_genre(
 ):
     await ut.admin_check(current_user)
     await qr.delete_genre(session, genre_id)
-    return None
+    return "Жанр удалён"
 
 
 ################################################################################
@@ -130,7 +128,7 @@ async def update_film(
     return await validator.film_to_pydantic(updated_film)
 
 
-@router.delete("/{film_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{film_id}", status_code=status.HTTP_200_OK)
 async def delete_film(
     film_id: int,
     session: AsyncSession = Depends(get_session),
@@ -138,4 +136,4 @@ async def delete_film(
 ):
     await ut.admin_check(current_user)
     await qr.delete_film(session, film_id)
-    return None
+    return "Фильм удалён"
