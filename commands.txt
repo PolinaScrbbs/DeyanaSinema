@@ -1,0 +1,7 @@
+python -m venv .venv
+.venv/Scripts/Activate
+pip install -r requirements.txt
+uvicorn api.main:app --reload
+
+Если вылезает ошибка активации скриптов
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
